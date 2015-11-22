@@ -8,7 +8,7 @@ function LogDeterminant:updateOutput(input)
     for i = 1, batchSize do
         inputSize = ((input[i]):size())[1]
         --eps = torch.eye(inputSize):float() * 1e-2
-        eig_vals = (torch.eig(input:float()[i], 'N')):cuda()
+        eig_vals = torch.eig(input:[i], 'N')
         self.output[i] = (torch.log(eig_vals:select(2, 1))):sum()
     end
     return self.output
@@ -20,7 +20,7 @@ function LogDeterminant:updateGradInput(input, gradOutput)
     for i = 1, batchSize do  
         inputSize = ((input[i]):size())[1]
         --eps = torch.eye(inputSize):float() * 1e-2
-        invInput = (torch.inverse(input:float()[i])):cuda() 
+        invInput = torch.inverse(input[i]) 
         self.gradInput[i] = invInput:t() * gradOutput[i]:squeeze()
     end
     return self.gradInput
