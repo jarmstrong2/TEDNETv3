@@ -9,43 +9,43 @@ require 'inverse'
 local mixture = {}
 
 function mixture.gauss(inputSize, uDimSize, nMixture)
-    target = nn.Identity()()
-    pi = nn.Identity()()
-    mu = nn.Identity()()
-    u = nn.Identity()()
-    mask = nn.Identity()()
-    eps = nn.Identity()()
+    local target = nn.Identity()()
+    local pi = nn.Identity()()
+    local mu = nn.Identity()()
+    local u = nn.Identity()()
+    local mask = nn.Identity()()
+    local eps = nn.Identity()()
 
-    u_reshaped = nn.Reshape(nMixture, uDimSize, inputSize)(u)
-    u_pack = nn.SplitTable(2,4)(u_reshaped)
-    mu_reshaped = nn.Reshape(nMixture, 1, inputSize)(mu)
-    mu_pack = nn.SplitTable(2,4)(mu_reshaped)
-    pi_reshaped = nn.Reshape(nMixture, 1)(pi)
-    pi_pack = nn.SplitTable(2,3)(pi_reshaped)
-    target_reshaped = nn.Reshape(1, inputSize)(target)
+    local u_reshaped = nn.Reshape(nMixture, uDimSize, inputSize)(u)
+    local u_pack = nn.SplitTable(2,4)(u_reshaped)
+    local mu_reshaped = nn.Reshape(nMixture, 1, inputSize)(mu)
+    local mu_pack = nn.SplitTable(2,4)(mu_reshaped)
+    local pi_reshaped = nn.Reshape(nMixture, 1)(pi)
+    local pi_pack = nn.SplitTable(2,3)(pi_reshaped)
+    local target_reshaped = nn.Reshape(1, inputSize)(target)
 
     for i = 1, nMixture do
-        u_set = nn.SelectTable(i)(u_pack)
-        mu_set = nn.SelectTable(i)(mu_pack)
-        pi_set = nn.SelectTable(i)(pi_pack)
+        local u_set = nn.SelectTable(i)(u_pack)
+        local mu_set = nn.SelectTable(i)(mu_pack)
+        local pi_set = nn.SelectTable(i)(pi_pack)
 
-        sigma = nn.CAddTable()({nn.MM()({nn.Transpose({2,3})(u_set), u_set}), eps})
+        local sigma = nn.CAddTable()({nn.MM()({nn.Transpose({2,3})(u_set), u_set}), eps})
 
-        det_sigma_2_pi = nn.Add(inputSize, inputSize * torch.log(2 * math.pi))
+        local det_sigma_2_pi = nn.Add(inputSize, inputSize * torch.log(2 * math.pi))
         (nn.LogDeterminant()(sigma))
 
-        sqr_det_sigma_2_pi = nn.MulConstant(-0.5)(det_sigma_2_pi)
+        local sqr_det_sigma_2_pi = nn.MulConstant(-0.5)(det_sigma_2_pi)
 
-        target_mu = nn.CAddTable()({target_reshaped, nn.MulConstant(-1)(mu_set)})
-        transpose_target_mu = nn.Transpose({2,3})(target_mu)
-        inv_sigma = nn.Inverse()(sigma)
-        transpose_target_mu_sigma = 
+        local target_mu = nn.CAddTable()({target_reshaped, nn.MulConstant(-1)(mu_set)})
+        local transpose_target_mu = nn.Transpose({2,3})(target_mu)
+        local inv_sigma = nn.Inverse()(sigma)
+        local transpose_target_mu_sigma = 
         nn.MM()({target_mu, inv_sigma})
-        transpose_target_mu_sigma_target_mu = 
+        local transpose_target_mu_sigma_target_mu = 
         nn.MM()({transpose_target_mu_sigma, transpose_target_mu})
-        exp_term = nn.MulConstant(-0.5)(transpose_target_mu_sigma_target_mu)
+        local exp_term = nn.MulConstant(-0.5)(transpose_target_mu_sigma_target_mu)
 
-        mixture_result = nn.CAddTable()({pi_set, sqr_det_sigma_2_pi, exp_term})
+        local mixture_result = nn.CAddTable()({pi_set, sqr_det_sigma_2_pi, exp_term})
 
         -- Essentially this is the same a addlogsumexp
 
@@ -56,15 +56,15 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
                 mixture_result})
         end
 
-        max_mixture = nn.Max(2)(join_mixture_result)
-        max_expanded = nn.MulConstant(-1)(nn.Replicate(nMixture, 2, 2)(max_mixture))
-        norm_mixture = nn.CAddTable()({max_expanded, join_mixture_result})
-        norm_mixture_exp = nn.Exp()(norm_mixture)
-        norm_mixture_sumexp = nn.Sum(2)(norm_mixture_exp)
-        norm_mixture_logsumexp = nn.Log()(norm_mixture_sumexp)
-        norm_mixture_addlogsumexp = nn.CAddTable()({max_mixture, norm_mixture_logsumexp})
-        norm_mixture_addlogsumexp = nn.MulConstant(-1)(norm_mixture_addlogsumexp)
-        result = nn.CMulTable()({mask, norm_mixture_addlogsumexp})
+        local max_mixture = nn.Max(2)(join_mixture_result)
+        local max_expanded = nn.MulConstant(-1)(nn.Replicate(nMixture, 2, 2)(max_mixture))
+        local norm_mixture = nn.CAddTable()({max_expanded, join_mixture_result})
+        local norm_mixture_exp = nn.Exp()(norm_mixture)
+        local norm_mixture_sumexp = nn.Sum(2)(norm_mixture_exp)
+        local norm_mixture_logsumexp = nn.Log()(norm_mixture_sumexp)
+        local norm_mixture_addlogsumexp = nn.CAddTable()({max_mixture, norm_mixture_logsumexp})
+        local norm_mixture_addlogsumexp = nn.MulConstant(-1)(norm_mixture_addlogsumexp)
+        local result = nn.CMulTable()({mask, norm_mixture_addlogsumexp})
     end
 
     return nn.gModule({pi, mu, u, mask, target, eps}, {result})
