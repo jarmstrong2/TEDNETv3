@@ -1,3 +1,5 @@
+require 'cutorch'
+require 'cunn'
 require 'nn'
 require 'nngraph'
 require 'torch'
