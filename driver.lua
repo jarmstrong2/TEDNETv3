@@ -5,6 +5,7 @@ cmd:text('Script for training model.')
 
 cmd:option('-inputSize' , 35, 'number of input dimension')
 cmd:option('-hiddenSize' , 800, 'number of hidden units in lstms')
+cmd:option('-dimSize' , 2, 'dim size for U')
 cmd:option('-lr' , 3e-3, 'learning rate')
 cmd:option('-maxlen', 500, 'max sequence length')
 cmd:option('-batchSize' , 4, 'mini batch size')
