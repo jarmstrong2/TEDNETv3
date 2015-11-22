@@ -19,7 +19,7 @@ print('start model making')
 -- make model
 model = {}
 
-model.criterion = mixture.gauss(opt.inputSize, opt.dimSize, opt.numMixture)
+model.criterion = mixture.gauss(opt.inputSize, opt.dimSize, opt.numMixture):cuda()
 
 local input_xin = nn.Identity()()
 local input_context = nn.Identity()()

@@ -103,8 +103,10 @@ function getValLoss()
        
             pi, mu, u = unpack(output_y[t])
 
-            loss = clones.criterion[t]:forward({pi:float(), mu:float(), u:float(),
-                cmaskMat[{{},{},{t}}]:float(), x_target:float()}):sum() + loss        
+            --loss = clones.criterion[t]:forward({pi:float(), mu:float(), u:float(),
+            --    cmaskMat[{{},{},{t}}]:float(), x_target:float()}):sum() + loss  
+            loss = clones.criterion[t]:forward({pi:cuda(), mu:cuda(), u:cuda(),
+                cmaskMat[{{},{},{t}}]:cuda(), x_target:cuda()}):sum() + loss       
         end
 
         loss = loss/(valsampleSize * valnumberOfPasses)
@@ -186,10 +188,13 @@ function feval(x)
                  kappa_prev[t-1], w[t-1], lstm_c_h1[t-1], lstm_h_h1[t-1],
                  lstm_c_h2[t-1], lstm_h_h2[t-1], lstm_c_h3[t-1], lstm_h_h3[t-1], lstm_c_h4[t-1], lstm_h_h4[t-1]}))
        
-            pi, mu, u = unpack(output_y[t])
+            pi, mu, u, _, _ = unpack(output_y[t])
 
-            input_crit[t] = {pi:float(), mu:float(), u:float(),
-            cmaskMat[{{},{},{t}}]:float(), x_target:float()}
+            --input_crit[t] = {pi:float(), mu:float(), u:float(),
+            --cmaskMat[{{},{},{t}}]:float(), x_target:float()}
+
+            input_crit[t] = {pi:cuda(), mu:cuda(), u:cuda(),
+            cmaskMat[{{},{},{t}}]:cuda(), x_target:cuda()}
 
             loss = clones.criterion[t]:forward(input_crit[t]):sum() + loss 
         end
@@ -218,8 +223,9 @@ function feval(x)
             local x_target = inputMat[{{},{1,opt.inputSize},{t+1}}]:squeeze()
             
             -- criterion
-            local grad_crit = clones.criterion[t]:backward(input_crit[t], torch.ones(sampleSize,1):float())            
-            	
+            --local grad_crit = clones.criterion[t]:backward(input_crit[t], torch.ones(sampleSize,1):float())            
+            local grad_crit = clones.criterion[t]:backward(input_crit[t], torch.ones(sampleSize,1):cuda())
+
             d_pi, d_mu, d_u = unpack(grad_crit)
 
             -- model
