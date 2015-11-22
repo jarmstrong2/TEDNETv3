@@ -3,18 +3,15 @@
 local LSTMH1 = {}
 
 -- Creates one timestep of one LSTM
-function LSTMH1.lstm(lookupSize, inputSize, hiddenSize)
-    local lookup = nn.Identity()()
-    local input = nn.Identity()()
+function LSTMH1.lstm(inputSize, hiddenSize)
+    local x = nn.Identity()()
     local w = nn.Identity()()
     local prev_c = nn.Identity()()
     local prev_h = nn.Identity()()
 
     function new_input_sum()
-        -- transforms look-up vector
-        local l2h            = nn.Linear(lookupSize, hiddenSize)(input)
         -- transforms input
-        local i2h            = nn.Linear(inputSize, hiddenSize)(input)
+        local i2h            = nn.Linear(inputSize, hiddenSize)(x)
         -- transforms window
         local w2h            = nn.Linear(32, hiddenSize)(w)
         -- transforms previous timestep's output
@@ -33,7 +30,7 @@ function LSTMH1.lstm(lookupSize, inputSize, hiddenSize)
     })
     local next_h           = nn.CMulTable()({out_gate, nn.Tanh()(next_c)})
 
-    return nn.gModule({lookup, input, w, prev_c, prev_h}, {next_c, next_h})
+    return nn.gModule({x, w, prev_c, prev_h}, {next_c, next_h})
 end
 
 return LSTMH1
