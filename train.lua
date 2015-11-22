@@ -199,7 +199,7 @@ function feval(x)
         end
 
         loss = loss/(sampleSize*numberOfPasses)
-        print('current pass ',loss)        
+        --print('current pass ',loss)        
         elems = (elementCount - sampleSize) + elems
         
         -- BACKWARD
