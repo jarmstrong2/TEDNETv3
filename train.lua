@@ -251,7 +251,11 @@ function feval(x)
                  {{d_pi:cuda(), d_mu:cuda(), d_u:cuda()}, dkappa, dh1_w, _, dlstm_c_h1, dlstm_h_h1, 
                   dlstm_c_h2, dlstm_h_h2, dlstm_c_h3, dlstm_h_h3, dlstm_c_h4, dlstm_h_h4}))
         end
-
+        input_crit = nil
+        grad_crit = nil
+        d_pi = nil
+        d_mu = nil
+        d_u = nil
         dh2_w = nil
         dh2_h1 = nil
         dh3_w = nil
@@ -268,12 +272,16 @@ function feval(x)
         lstm_h_h2 = nil -- output values of LSTM
         lstm_c_h3 = nil -- internal cell states of LSTM
         lstm_h_h3 = nil -- output values of LSTM
+        lstm_c_h4 = nil -- internal cell states of LSTM
+        lstm_h_h4 = nil -- output values of LSTM
         dlstm_c_h1 = nil -- internal cell states of LSTM
         dlstm_h_h1 = nil -- internal cell states of LSTM
         dlstm_c_h2 = nil -- internal cell states of LSTM
         dlstm_h_h2 = nil -- internal cell states of LSTM
         dlstm_c_h3 = nil -- internal cell states of LSTM
         dlstm_h_h3 = nil -- internal cell states of LSTM
+        dlstm_c_h4 = nil -- internal cell states of LSTM
+        dlstm_h_h4 = nil -- internal cell states of LSTM
         dkappaNext = nil
         dh1_w_next = nil
         kappa_prev = nil
