@@ -27,7 +27,7 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
         mu_set = nn.SelectTable(i)(mu_pack)
         pi_set = nn.SelectTable(i)(pi_pack)
 
-        sigma = nn.CAddTable({nn.MM()({nn.Transpose({2,3})(u_set), u_set}), eps})
+        sigma = nn.CAddTable()({nn.MM()({nn.Transpose({2,3})(u_set), u_set}), eps})
 
         det_sigma_2_pi = nn.Add(inputSize, inputSize * torch.log(2 * math.pi))
         (nn.LogDeterminant()(sigma))
