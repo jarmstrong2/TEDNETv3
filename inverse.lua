@@ -9,7 +9,7 @@ function Inverse:updateOutput(input)
     for i = 1, batchSize do
         inputSize = ((input[i]):size())[1]
         --eps = torch.eye(inputSize):float() * 1e-1
-        self.output[i] = (torch.inverse(input:float()[i])):cuda()
+        self.output[i] = (torch.inverse(input[i]))
     end
     return self.output
 end
@@ -21,8 +21,8 @@ function Inverse:updateGradInput(input, gradOutput)
     for i = 1, batchSize do
         inputSize = ((input[i]):size())[1]
         --eps = torch.eye(inputSize):float() * 1e-1  
-        self.gradInput[i] = -((torch.inverse(input:float()[i])):cuda() * 
-            gradOutput[i]) * (torch.inverse(input:float()[i])):cuda()
+        self.gradInput[i] = -((torch.inverse(input[i])) * 
+            gradOutput[i]) * (torch.inverse(input[i]))
     end
     return self.gradInput
 end
