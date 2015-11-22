@@ -47,7 +47,7 @@ batchCount = nil
 
 function getEps()
    eps = torch.eye(opt.inputSize,opt.inputSize)
-   eps:resize(1,inputSize,opt.inputSize)
+   eps:resize(1,opt.inputSize,opt.inputSize)
    fulleps = eps:clone()
    for i = 2, opt.batchSize do
        fulleps = torch.cat(fulleps,eps,1)
