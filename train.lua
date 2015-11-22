@@ -203,7 +203,7 @@ function feval(x)
                  kappa_prev[t-1], w[t-1], lstm_c_h1[t-1], lstm_h_h1[t-1],
                  lstm_c_h2[t-1], lstm_h_h2[t-1], lstm_c_h3[t-1], lstm_h_h3[t-1], lstm_c_h4[t-1], lstm_h_h4[t-1]}))
        
-            pi, mu, u,= unpack(output_y[t])
+            pi, mu, u = unpack(output_y[t])
 
             --input_crit[t] = {pi:float(), mu:float(), u:float(),
             --cmaskMat[{{},{},{t}}]:float(), x_target:float()}
