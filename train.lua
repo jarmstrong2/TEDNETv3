@@ -65,7 +65,7 @@ function getValLoss()
         = getBatch(valcount, valSTRAIGHTdata, valsampleSize)
         ------------------------------------------------------------
 
-        count = 1
+        valcount = 1
 
         if maxLen > MAXLEN then
             maxLen = MAXLEN
