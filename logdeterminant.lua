@@ -8,7 +8,7 @@ function LogDeterminant:updateOutput(input)
     for i = 1, batchSize do
         inputSize = ((input[i]):size())[1]
         --eps = torch.eye(inputSize):float() * 1e-2
-        eig_vals = torch.eig(input:[i], 'N')
+        eig_vals = torch.eig(input[i], 'N')
         self.output[i] = (torch.log(eig_vals:select(2, 1))):sum()
     end
     return self.output
