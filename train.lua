@@ -46,7 +46,7 @@ count = 1
 batchCount = nil
 
 function getInitW(cuMat)
-	cuMatClone = cuMat:clone()
+    cuMatClone = cuMat:clone()
     return torch.zero(cuMatClone[{{},{1},{}}]:squeeze(2))
 end
 
@@ -105,8 +105,10 @@ function getValLoss()
        
             pi, mu, u = unpack(output_y[t])
 
-            loss = clones.criterion[t]:forward({pi:float(), mu:float(), u:float(),
-                cmaskMat[{{},{},{t}}]:float(), x_target:float()}):sum() + loss        
+            --loss = clones.criterion[t]:forward({pi:float(), mu:float(), u:float(),
+            --    cmaskMat[{{},{},{t}}]:float(), x_target:float()}):sum() + loss  
+            loss = clones.criterion[t]:forward({pi:cuda(), mu:cuda(), u:cuda(),
+                cmaskMat[{{},{},{t}}]:cuda(), x_target:cuda()}):sum() + loss       
         end
 
         loss = loss/(valsampleSize * valnumberOfPasses)
@@ -190,10 +192,13 @@ function feval(x)
                  kappa_prev[t-1], w[t-1], lstm_c_h1[t-1], lstm_h_h1[t-1],
                  lstm_c_h2[t-1], lstm_h_h2[t-1], lstm_c_h3[t-1], lstm_h_h3[t-1], lstm_c_h4[t-1], lstm_h_h4[t-1]}))
        
-            pi, mu, u = unpack(output_y[t])
+            pi, mu, u, _, _ = unpack(output_y[t])
 
-            input_crit[t] = {pi:float(), mu:float(), u:float(),
-            cmaskMat[{{},{},{t}}]:float(), x_target:float()}
+            --input_crit[t] = {pi:float(), mu:float(), u:float(),
+            --cmaskMat[{{},{},{t}}]:float(), x_target:float()}
+
+            input_crit[t] = {pi:cuda(), mu:cuda(), u:cuda(),
+            cmaskMat[{{},{},{t}}]:cuda(), x_target:cuda()}
 
             loss = clones.criterion[t]:forward(input_crit[t]):sum() + loss 
         end
@@ -222,8 +227,9 @@ function feval(x)
             local x_target = inputMat[{{},{1,opt.inputSize},{t+1}}]:squeeze()
             
             -- criterion
-            local grad_crit = clones.criterion[t]:backward(input_crit[t], torch.ones(sampleSize,1):float())            
-            	
+            --local grad_crit = clones.criterion[t]:backward(input_crit[t], torch.ones(sampleSize,1):float())            
+            local grad_crit = clones.criterion[t]:backward(input_crit[t], torch.ones(sampleSize,1):cuda())
+
             d_pi, d_mu, d_u = unpack(grad_crit)
 
             -- model
@@ -298,38 +304,38 @@ for i = 1, iterations do
         end
         
         if valLoss ~= 1/0 then
-		if not vallosses or (#vallosses)[1] >= 900 then
-		 	vallosses = torch.Tensor(1)
-		 	vallosses[1] = valLoss
-			valiter = torch.Tensor(1)
-			valiter[1] = i
-		else
-			vallossesaddition = torch.Tensor(1)
-        	        vallossesaddition[1] = valLoss
-        	        valiteraddition = torch.Tensor(1)
-        	        valiteraddition[1] = i
-			vallosses = torch.cat(vallosses:float(), vallossesaddition:float(), 1)
-			valiter = torch.cat(valiter, valiteraddition, 1)
-		end
+        if not vallosses or (#vallosses)[1] >= 900 then
+            vallosses = torch.Tensor(1)
+            vallosses[1] = valLoss
+            valiter = torch.Tensor(1)
+            valiter[1] = i
+        else
+            vallossesaddition = torch.Tensor(1)
+                    vallossesaddition[1] = valLoss
+                    valiteraddition = torch.Tensor(1)
+                    valiteraddition[1] = i
+            vallosses = torch.cat(vallosses:float(), vallossesaddition:float(), 1)
+            valiter = torch.cat(valiter, valiteraddition, 1)
+        end
         end
         
         if loss[1] ~= 1/0 then
-		if not losses or (#losses)[1] >= 900 then
-        	        losses = torch.Tensor(1)
-         		losses[1] = loss[1]
-                	iter = torch.Tensor(1)
-                	iter[1] = i
-        	else
-                	lossesaddition = torch.Tensor(1,1)
-                	lossesaddition[1] = loss[1]
-                	iteraddition = torch.Tensor(1)
-                	iteraddition[1] = i
-                	losses = torch.cat(losses:float(), lossesaddition:float(),1)
-                	iter = torch.cat(iter, iteraddition, 1)
-        	end
+        if not losses or (#losses)[1] >= 900 then
+                    losses = torch.Tensor(1)
+                losses[1] = loss[1]
+                    iter = torch.Tensor(1)
+                    iter[1] = i
+            else
+                    lossesaddition = torch.Tensor(1,1)
+                    lossesaddition[1] = loss[1]
+                    iteraddition = torch.Tensor(1)
+                    iteraddition[1] = i
+                    losses = torch.cat(losses:float(), lossesaddition:float(),1)
+                    iter = torch.cat(iter, iteraddition, 1)
+            end
         end
-	gnuplot.pngfigure(opt.lossImageFN)
-	gnuplot.plot({iter, losses},{valiter, vallosses})
-	gnuplot.plotflush()
+    gnuplot.pngfigure(opt.lossImageFN)
+    gnuplot.plot({iter, losses},{valiter, vallosses})
+    gnuplot.plotflush()
     end
 end
