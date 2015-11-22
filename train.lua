@@ -122,7 +122,9 @@ function getValLoss()
         end
 
         loss = loss/(valsampleSize * valnumberOfPasses)
-
+        pi = nil
+        mu = nil 
+        u = nil
         maxLen = nil
         strs = nil
         inputMat = nil 
@@ -135,6 +137,8 @@ function getValLoss()
         lstm_h_h2 = nil -- output values of LSTM
         lstm_c_h3 = nil -- internal cell states of LSTM
         lstm_h_h3 = nil -- output values of LSTM
+        lstm_c_h4 = nil -- internal cell states of LSTM
+        lstm_h_h4 = nil -- output values of LSTM
         kappa_prev = nil
         output_h1_w = nil
         input_h3_y = nil
