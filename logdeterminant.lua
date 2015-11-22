@@ -4,7 +4,7 @@ local LogDeterminant, parent = torch.class('nn.LogDeterminant', 'nn.Module')
 
 function LogDeterminant:updateOutput(input)
     batchSize = input:size()[1]
-    self.output = torch.zeros(batchSize, 1):cuda()
+    self.output = torch.CudaTensor(batchSize, 1)
     for i = 1, batchSize do
         inputSize = ((input[i]):size())[1]
         --eps = torch.eye(inputSize):float() * 1e-2
@@ -16,7 +16,7 @@ end
 
 function LogDeterminant:updateGradInput(input, gradOutput)
     batchSize = input:size()[1]
-    self.gradInput =  torch.zeros(input:size()):cuda()
+    self.gradInput =  torch.CudaTensor(input:size())
     for i = 1, batchSize do  
         inputSize = ((input[i]):size())[1]
         --eps = torch.eye(inputSize):float() * 1e-2
