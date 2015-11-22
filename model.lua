@@ -12,7 +12,7 @@ require 'mixtureGuass'
 local model_utils=require 'model_utils'
 require 'cunn'
 require 'distributions'
-require mixture = 'mixtureGauss'
+local mixture = require 'mixtureGauss'
 torch.manualSeed(123)
 
 print('start model making')
