@@ -19,10 +19,13 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
     local u_reshaped = nn.Reshape(nMixture, uDimSize, inputSize)(u)
     local u_pack = nn.SplitTable(2,4)(u_reshaped)
     local mu_reshaped = nn.Reshape(nMixture, 1, inputSize)(mu)
-    local mu_pack = nn.SplitTable(2,4)(mu_reshaped)
+    local target_reshaped = nn.Reshape(1, 1, inputSize)(target)
+    local target_replicate = nn.Replicate(nMixture, 1, inputSize)(target_reshaped)
+    --local mu_pack = nn.SplitTable(2,4)(mu_reshaped)
+    local mu_pack = nn.SplitTable(2,4)(CAddTable()({nn.MulConstant(-1)(mu_reshaped), target_replicate})
     local pi_reshaped = nn.Reshape(nMixture, 1)(pi)
     --local pi_pack = nn.SplitTable(2,3)(pi_reshaped)
-    local target_reshaped = nn.Reshape(1, inputSize)(target)
+    
 
     for i = 1, nMixture do
         local u_set = nn.SelectTable(i)(u_pack)
@@ -36,7 +39,7 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
 
         local sqr_det_sigma_2_pi = nn.MulConstant(-0.5)(det_sigma_2_pi)
 
-        local target_mu = nn.CAddTable()({target_reshaped, nn.MulConstant(-1)(mu_set)})
+        local target_mu = mu_set
         local transpose_target_mu = nn.Transpose({2,3})(target_mu)
         local inv_sigma = nn.Inverse()(sigma)
         local transpose_target_mu_sigma = 
