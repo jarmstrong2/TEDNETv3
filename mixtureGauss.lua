@@ -4,7 +4,7 @@ require 'nn'
 require 'nngraph'
 require 'torch'
 require 'logdeterminant_nocuda'
-require 'inverse_cuda'
+require 'inverse_nocuda'
 
 local mixture = {}
 
