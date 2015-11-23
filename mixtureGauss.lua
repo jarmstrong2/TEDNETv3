@@ -47,8 +47,6 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
 
         local mixture_result = nn.CAddTable()({pi_set, sqr_det_sigma_2_pi, exp_term})
 
-        -- Essentially this is the same a addlogsumexp
-
         if i == 1 then
             join_mixture_result = mixture_result
         else
@@ -56,7 +54,8 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
                 mixture_result})
         end
     end
-       
+    
+    -- Essentially this is the same a addlogsumexp   
     local max_mixture = nn.Max(2)(join_mixture_result)
     local max_expanded = nn.MulConstant(-1)(nn.Replicate(nMixture, 2, 2)(max_mixture))
     local norm_mixture = nn.CAddTable()({max_expanded, join_mixture_result})
