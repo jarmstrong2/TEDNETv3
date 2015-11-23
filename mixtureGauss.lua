@@ -21,13 +21,13 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
     local mu_reshaped = nn.Reshape(nMixture, 1, inputSize)(mu)
     local mu_pack = nn.SplitTable(2,4)(mu_reshaped)
     local pi_reshaped = nn.Reshape(nMixture, 1)(pi)
-    local pi_pack = nn.SplitTable(2,3)(pi_reshaped)
+    --local pi_pack = nn.SplitTable(2,3)(pi_reshaped)
     local target_reshaped = nn.Reshape(1, inputSize)(target)
 
     for i = 1, nMixture do
         local u_set = nn.SelectTable(i)(u_pack)
         local mu_set = nn.SelectTable(i)(mu_pack)
-        local pi_set = nn.SelectTable(i)(pi_pack)
+        --local pi_set = nn.SelectTable(i)(pi_pack)
 
         local sigma = nn.CAddTable()({nn.MM()({nn.Transpose({2,3})(u_set), u_set}), eps})
 
@@ -45,7 +45,8 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
         nn.MM()({transpose_target_mu_sigma, transpose_target_mu})
         local exp_term = nn.MulConstant(-0.5)(transpose_target_mu_sigma_target_mu)
 
-        local mixture_result = nn.CAddTable()({pi_set, sqr_det_sigma_2_pi, exp_term})
+        --local mixture_result = nn.CAddTable()({pi_set, sqr_det_sigma_2_pi, exp_term})
+        local mixture_result = nn.CAddTable()({sqr_det_sigma_2_pi, exp_term})
 
         if i == 1 then
             join_mixture_result = mixture_result
@@ -54,6 +55,8 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
                 mixture_result})
         end
     end
+    
+    join_mixture_result = nn.CAddTable()({join_mixture_result, pi_reshaped})
     
     -- Essentially this is the same a addlogsumexp   
     local max_mixture = nn.Max(2)(join_mixture_result)
