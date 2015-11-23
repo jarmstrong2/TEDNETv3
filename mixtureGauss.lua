@@ -55,17 +55,17 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
             join_mixture_result = nn.JoinTable(2)({join_mixture_result, 
                 mixture_result})
         end
-
-        local max_mixture = nn.Max(2)(join_mixture_result)
-        local max_expanded = nn.MulConstant(-1)(nn.Replicate(nMixture, 2, 2)(max_mixture))
-        local norm_mixture = nn.CAddTable()({max_expanded, join_mixture_result})
-        local norm_mixture_exp = nn.Exp()(norm_mixture)
-        local norm_mixture_sumexp = nn.Sum(2)(norm_mixture_exp)
-        local norm_mixture_logsumexp = nn.Log()(norm_mixture_sumexp)
-        local norm_mixture_addlogsumexp = nn.CAddTable()({max_mixture, norm_mixture_logsumexp})
-        norm_mixture_addlogsumexp = nn.MulConstant(-1)(norm_mixture_addlogsumexp)
-        result = nn.CMulTable()({mask, norm_mixture_addlogsumexp})
     end
+       
+    local max_mixture = nn.Max(2)(join_mixture_result)
+    local max_expanded = nn.MulConstant(-1)(nn.Replicate(nMixture, 2, 2)(max_mixture))
+    local norm_mixture = nn.CAddTable()({max_expanded, join_mixture_result})
+    local norm_mixture_exp = nn.Exp()(norm_mixture)
+    local norm_mixture_sumexp = nn.Sum(2)(norm_mixture_exp)
+    local norm_mixture_logsumexp = nn.Log()(norm_mixture_sumexp)
+    local norm_mixture_addlogsumexp = nn.CAddTable()({max_mixture, norm_mixture_logsumexp})
+    norm_mixture_addlogsumexp = nn.MulConstant(-1)(norm_mixture_addlogsumexp)
+    result = nn.CMulTable()({mask, norm_mixture_addlogsumexp})
 
     return nn.gModule({pi, mu, u, mask, target, eps}, {result})
 end
