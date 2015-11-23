@@ -64,7 +64,7 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
     local norm_mixture_logsumexp = nn.Log()(norm_mixture_sumexp)
     local norm_mixture_addlogsumexp = nn.CAddTable()({max_mixture, norm_mixture_logsumexp})
     norm_mixture_addlogsumexp = nn.MulConstant(-1)(norm_mixture_addlogsumexp)
-    result = nn.CMulTable()({mask, norm_mixture_addlogsumexp})
+    local result = nn.CMulTable()({mask, norm_mixture_addlogsumexp})
 
     return nn.gModule({pi, mu, u, mask, target, eps}, {result})
 end
