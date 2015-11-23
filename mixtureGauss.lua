@@ -22,7 +22,7 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
     local target_reshaped = nn.Reshape(1, 1, inputSize)(target)
     local target_replicate = nn.Replicate(nMixture, 1, inputSize)(target_reshaped)
     --local mu_pack = nn.SplitTable(2,4)(mu_reshaped)
-    local mu_pack = nn.SplitTable(2,4)(CAddTable()({nn.MulConstant(-1)(mu_reshaped), target_replicate}))
+    local mu_pack = nn.SplitTable(2,4)(nn.CAddTable()({nn.MulConstant(-1)(mu_reshaped), target_replicate}))
     local pi_reshaped = nn.Reshape(nMixture, 1)(pi)
     --local pi_pack = nn.SplitTable(2,3)(pi_reshaped)
     
