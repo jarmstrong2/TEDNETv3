@@ -3,8 +3,8 @@ require 'cunn'
 require 'nn'
 require 'nngraph'
 require 'torch'
-require 'logdeterminant'
-require 'inverse'
+require 'logdeterminant_nocuda'
+require 'inverse_cuda'
 
 local mixture = {}
 
