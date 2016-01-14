@@ -31,7 +31,7 @@ function mixture.gauss(inputSize, uDimSize, nMixture)
 
         local sigma = nn.CAddTable()({nn.MM()({nn.Transpose({2,3})(u_set), u_set}), eps})
 
-        local det_sigma_2_pi = nn.AddConstant(inputSize, inputSize * torch.log(2 * math.pi))
+        local det_sigma_2_pi = nn.AddConstant(inputSize * torch.log(2 * math.pi))
         (nn.LogDeterminant()(sigma))
 
         local sqr_det_sigma_2_pi = nn.MulConstant(-0.5)(det_sigma_2_pi)
